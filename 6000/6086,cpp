@@ -1,0 +1,81 @@
+//kks227님의 코드를 참고해서 거의 같습니다. 
+//코드가 거의 같아서 문제가 된다면 삭제하겠습니다.
+#include <bits/stdc++.h>
+#include <unordered_set>
+#include <unordered_map>
+#include <random>
+using namespace std;
+#define ll long long
+#define fr first
+#define sc second
+#define pll pair<ll, ll>
+#define all(v) v.begin(), v.end()
+
+const int MAX_V = 52;
+const int INF = 1e9;
+
+inline int ctoi(char ch) {
+	if (ch <= 'Z') return ch - 'A';
+	return ch - 'a' + 26;
+}
+
+int c[MAX_V][MAX_V];
+int f[MAX_V][MAX_V];
+vector<int> adj[MAX_V];
+
+void solve() {
+	int N; cin >> N;
+	for (int i = 0; i < N; i++) {
+		char a, b; int w; 
+		cin >> a >> b >> w;
+		int u = ctoi(a), v = ctoi(b);
+		c[u][v] = c[v][u] += w;
+		adj[u].push_back(v);
+		adj[v].push_back(u);
+	}
+
+	int total = 0, S = ctoi('A'), E = ctoi('Z');
+	while (1) {
+		int prev[MAX_V];
+		fill(prev, prev + MAX_V, -1);
+		queue<int> q;
+		q.push(S);
+		while (q.size() && prev[E] == -1) {
+			int cur = q.front();
+			q.pop();
+			for (int nxt : adj[cur]) {
+				if (c[cur][nxt] - f[cur][nxt] > 0 && prev[nxt] == -1) {
+					q.push(nxt);
+					prev[nxt] = cur;
+					if (nxt == E) break;
+				}
+			}
+		}
+		if (prev[E] == -1) break;
+
+		int flow = INF;
+		for (int i = E; i != S; i = prev[i]) {
+			flow = min(flow, c[prev[i]][i] - f[prev[i]][i]);
+		}
+
+		for (int i = E; i != S; i = prev[i]) {
+			f[prev[i]][i] += flow;
+			f[i][prev[i]] -= flow;
+		}
+		total += flow;
+	}
+	cout << total << '\n';
+}
+
+int main() {
+	ios::sync_with_stdio(false);
+	cin.tie(0);
+	if (0) {
+		int T; cin >> T;
+		while (T--) solve();
+	}
+	else {
+		solve();
+	}
+	return 0;
+}
