@@ -1,0 +1,44 @@
+#include <bits/stdc++.h>
+#include <unordered_set>
+#include <unordered_map>
+#include <random>
+using namespace std;
+#define ll long long
+#define fr first
+#define sc second
+#define pll pair<ll, ll>
+#define all(v) v.begin(), v.end()
+
+int cache[11000];
+int dp(int n, int k) {
+	if (n == 1) return 1;
+
+	int& ret = cache[n];
+	if (ret != -1) return ret;
+
+	return ret = (dp(n - 1, k) + k - 1) % n + 1;
+}
+
+void solve() {
+	while (1) {
+		int n, k, m;
+		cin >> n >> k >> m;
+		if (n == 0 && k == 0 && m == 0) return;
+
+		memset(cache, -1, sizeof(cache));
+		cout << (dp(n - 1, k) + m - 1) % n + 1 << '\n';
+	}
+}
+
+int main() {
+	ios::sync_with_stdio(false);
+	cin.tie(0);
+	if ( 0) {
+		int T; cin >> T;
+		while (T--) solve();
+	}
+	else {
+		solve();
+	}
+	return 0;
+}
