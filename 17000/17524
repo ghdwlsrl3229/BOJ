@@ -1,0 +1,89 @@
+#include <bits/stdc++.h>
+#include <unordered_set>
+#include <unordered_map>
+#include <random>
+using namespace std;
+#define ll long long
+#define fr first
+#define sc second
+#define pll pair<ll, ll>
+#define all(v) v.begin(), v.end()
+
+int n, k;
+int w[110];
+
+vector<pll> v;
+ll f(int a, int b) {
+	return 30 + (v[a].fr - v[b].fr) * v[a].sc;
+}
+
+void solve() {
+	cin >> n >> k;
+	for (int i = 0; i < n; i++) {
+		int a, b; cin >> a >> b;
+		w[a] = max(w[a], b);
+	}
+	for (int i = 40; i <= 100; i++) if (w[i] > 0) v.push_back({ i, w[i] });
+
+	ll ans = 0;
+	for (int i = 0; i < v.size(); i++) ans = max(ans, 30 + (v[i].fr - v[0].fr) * v[i].sc);
+
+	if (k >= 2) {
+		for (int i = 1; i < v.size(); i++) { //시드
+			for (int j = 0; j < v.size(); j++) { //0의 최댓값 고정
+				if (j == i) continue;
+				bool used[110] = { 0 };
+				ll tmp0 = f(j, 0), tmp1 = 30;
+				used[0] = used[i] = used[j] = 1;
+				for (int k = 0; k < v.size(); k++) if (f(k, 0) <= tmp0) used[k] = 1;
+				
+				bool flag = 0;
+				for (int k = 0; k < i; k++) if (!used[k]) flag = 1;
+				if (flag) continue;
+				for (int k = i; k < v.size(); k++) if (!used[k]) tmp1 = max(tmp1, f(k, i));
+
+				ans = min(ans, tmp0 + tmp1);
+			}
+		}
+	}
+
+	if (k >= 3) {
+		//시드를 0, i, j로 놓는다.
+		for (int i = 1; i < v.size(); i++) { //1
+			for (int j = i + 1; j < v.size(); j++) { // 2
+				for (int k = 0; k < v.size(); k++) { // 0의 최댓값 고정
+					for (int s = i; s < v.size(); s++) { //1의 최댓값 고정
+						if (s == k || k == i || k == j || s == j) continue;
+						bool used[110] = { 0 };
+						used[k] = used[s] = used[0] = used[j] = used[i] = 1;
+						ll tmp0 = f(k, 0), tmp1 = f(s, i), tmp2 = 30;
+						for (int t = 0; t < v.size(); t++) if (tmp0 >= f(t, 0)) used[t] = 1;
+						for (int t = i; t < v.size(); t++) if (tmp1 >= f(t, i)) used[t] = 1;
+
+						bool flag = 0;
+						for (int t = 0; t < j; t++) if (!used[t]) flag = 1;
+						if (flag) continue;
+						for (int t = j; t < v.size(); t++) if (!used[t]) tmp2 = max(tmp2, f(t, j));
+
+						ans = min(ans, tmp0 + tmp1 + tmp2);
+					}
+				}
+			}
+		}
+	}
+
+	cout << ans << '\n';
+}
+
+int main() {
+	ios::sync_with_stdio(false);
+	cin.tie(0);
+	if ( 0) {
+		int T; cin >> T;
+		while (T--) solve();
+	}
+	else {
+		solve();
+	}
+	return 0;
+}
