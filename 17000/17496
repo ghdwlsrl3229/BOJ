@@ -1,0 +1,74 @@
+#include <bits/stdc++.h>
+#include <unordered_set>
+#include <unordered_map>
+#include <random>
+using namespace std;
+#define ll long long
+#define fr first
+#define sc second
+#define pll pair<ll, ll>
+#define all(v) v.begin(), v.end()
+
+int N, Q;
+int tree_pa[110000];
+set<int> color[110000];
+vector<pll> query;
+
+int pa[110000];
+int find(int n) {
+	if (pa[n] < 0) return n;
+	return pa[n] = find(pa[n]);
+}
+void merge(int a, int b) {
+	a = find(a);
+	b = find(b);
+	if (a == b) return;
+	if (color[a].size() > color[b].size()) {
+		for (int i : color[b]) color[a].insert(i);
+		pa[b] = a;
+	}
+	else {
+		for (int i : color[a]) color[b].insert(i);
+		pa[a] = b;
+	}
+}
+
+void solve(int tc) {
+	cin >> N >> Q;
+	for (int i = 2; i <= N; i++) cin >> tree_pa[i];
+	for (int i = 1; i <= N; i++) {
+		int a; cin >> a;
+		color[i].insert(a);
+	}
+	for (int i = 0; i < N + Q - 1; i++) {
+		int a, b; cin >> a >> b;
+		query.push_back({ a, b });
+	}
+	reverse(all(query));
+
+	vector<int> ans;
+	memset(pa, -1, sizeof(pa));
+	for (int i = 0; i < query.size(); i++) {
+		if (query[i].fr == 1) {
+			merge(query[i].sc, tree_pa[query[i].sc]);
+		}
+		else {
+			ans.push_back(color[find(query[i].sc)].size());
+		}
+	}
+	reverse(all(ans));
+	for (int i : ans) cout << i << '\n';
+}
+
+int main() {
+	ios::sync_with_stdio(false);
+	cin.tie(0);
+	if (0) {
+		int T; cin >> T;
+		for (int i = 1; i <= T; i++) solve(i);
+	}
+	else {
+		solve(0);
+	}
+	return 0;
+}
